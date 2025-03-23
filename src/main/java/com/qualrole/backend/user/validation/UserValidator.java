@@ -1,32 +1,49 @@
 package com.qualrole.backend.user.validation;
 
-import com.qualrole.backend.exception.CpfCnpjAlreadyInUseException;
+import com.qualrole.backend.exception.CpfOrCnpjAlreadyInUseException;
 import com.qualrole.backend.exception.EmailAlreadyInUseException;
-import com.qualrole.backend.user.entity.User;
-import com.qualrole.backend.user.repository.UserRepository;
+import com.qualrole.backend.user.entity.SystemUser;
+import com.qualrole.backend.user.repository.SystemUserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Componente responsável por validar informações de usuários.
+ */
 @Component
 public class UserValidator {
 
-    private final UserRepository userRepository;
+    private final SystemUserRepository systemUserRepository;
 
-    public UserValidator(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserValidator(SystemUserRepository systemUserRepository) {
+        this.systemUserRepository = systemUserRepository;
     }
 
+    /**
+     * Valida a unicidade de CPF ou CNPJ.
+     *
+     * @param cpfCnpj        CPF ou CNPJ do usuário.
+     * @param userIdToIgnore ID do usuário a ser ignorado na validação (para evitar conflitos em atualizações).
+     * @throws CpfOrCnpjAlreadyInUseException Se o CPF ou CNPJ já estiver em uso.
+     */
     public void validateCpfCnpjUniqueness(String cpfCnpj, String userIdToIgnore) {
-        Optional<User> existingUser = userRepository.findByCpfCnpj(cpfCnpj);
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(userIdToIgnore)) {
-            throw new CpfCnpjAlreadyInUseException("CPF/CNPJ já está em uso.");
+        Optional<SystemUser> existingUser = systemUserRepository.findByCpfCnpj(cpfCnpj);
+        if (existingUser.isPresent() && !existingUser.get().getSystemUserId().equals(userIdToIgnore)) {
+            throw new CpfOrCnpjAlreadyInUseException("CPF/CNPJ já está em uso.");
         }
     }
 
+    /**
+     * Valida a unicidade do email.
+     *
+     * @param email          Email do usuário.
+     * @param userIdToIgnore ID do usuário a ser ignorado na validação (para evitar conflitos em atualizações).
+     * @throws EmailAlreadyInUseException Se o email já estiver em uso.
+     */
     public void validateEmailUniqueness(String email, String userIdToIgnore) {
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        if (existingUser.isPresent() && !existingUser.get().getId().equals(userIdToIgnore)) {
+        Optional<SystemUser> existingUser = systemUserRepository.findByEmail(email);
+        if (existingUser.isPresent() && !existingUser.get().getSystemUserId().equals(userIdToIgnore)) {
             throw new EmailAlreadyInUseException("Email já está em uso.");
         }
     }
