@@ -4,6 +4,9 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * Representa a estrutura de uma resposta de erro ao cliente.
+ */
 public class ErrorResponse {
 
     private final int status;

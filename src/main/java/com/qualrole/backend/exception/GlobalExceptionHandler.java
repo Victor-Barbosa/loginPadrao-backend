@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe que gerencia todas as exceções lançadas no sistema e retorna respostas padronizadas.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CpfCnpjAlreadyInUseException.class)
-    public ResponseEntity<ErrorResponse> handleCpfCnpjAlreadyInUse(CpfCnpjAlreadyInUseException ex) {
+    @ExceptionHandler(CpfOrCnpjAlreadyInUseException.class)
+    public ResponseEntity<ErrorResponse> handleCpfCnpjAlreadyInUse(CpfOrCnpjAlreadyInUseException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
         return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
     }
@@ -22,6 +25,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyInUse(EmailAlreadyInUseException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(OAuth2EmailNotFoundException.class)
+    public ResponseEntity<Object> handleOAuth2EmailNotFound(OAuth2EmailNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
         return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
     }
 
