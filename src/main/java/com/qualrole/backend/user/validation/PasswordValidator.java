@@ -14,7 +14,6 @@ public class PasswordValidator {
 
     /**
      * Valida se a senha fornecida atende aos critérios estabelecidos.
-     *
      * Os critérios incluem:
      * <ul>
      *   <li>Mínimo de 8 caracteres.</li>
