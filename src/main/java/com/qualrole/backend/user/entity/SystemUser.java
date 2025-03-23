@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
- * Entidade que representa um usuário do sistema.
+ * Entidade que representa um usuario do sistema.
  */
 @Entity
 @Table(name = "system_users")
