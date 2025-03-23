@@ -26,7 +26,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class CpfOrCnpjValidator implements ConstraintValidator<CpfOrCnpj, String> {
 
     /**
-     * Método que valida se o valor informado é um CPF ou CNPJ válido.
+     * Valida se o valor informado é um CPF ou CNPJ válido.
      *
      * @param value   Valor a ser validado. Pode ser um CPF ou CNPJ.
      * @param context Contexto da validação.
