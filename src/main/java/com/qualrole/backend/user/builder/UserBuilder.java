@@ -9,16 +9,16 @@ import com.qualrole.backend.user.entity.SystemUser;
 import org.springframework.stereotype.Component;
 
 /**
- * Classe responsável por construir objetos de usuários do sistema
- * baseados em DTOs (Data Transfer Objects).
+ * Classe responsável por construir objetos de usuarios do sistema
+ * baseado em DTOs (Data Transfer Objects).
  */
 @Component
 public class UserBuilder {
 
     /**
-     * Constrói um novo usuário completo do sistema a partir de um DTO.
+     * Constrói um novo usuario completo do sistema a partir de um DTO.
      *
-     * @param completeSystemUserDTO DTO contendo os dados completos do usuário.
+     * @param completeSystemUserDTO DTO contendo os dados completos do usuario.
      * @return {@link SystemUser} com informações completas.
      */
     public SystemUser buildNewCompleteSystemUser(CompleteSystemUserDTO completeSystemUserDTO) {
@@ -38,9 +38,9 @@ public class UserBuilder {
     }
 
     /**
-     * Constrói um novo usuário simples do sistema a partir de um DTO.
+     * Constrói um novo usuario simples do sistema a partir de um DTO.
      *
-     * @param simpleSystemUserDTO DTO contendo os dados do usuário simples.
+     * @param simpleSystemUserDTO DTO contendo os dados do usuario simples.
      * @return {@link SystemUser} com informações básicas.
      */
     public SystemUser buildNewSimpleSystemUser(SimpleSystemUserDTO simpleSystemUserDTO) {
@@ -57,9 +57,36 @@ public class UserBuilder {
                 address,
                 simpleSystemUserDTO.birthDate(),
                 simpleSystemUserDTO.password(),
-                Role.USER
+                Role.STANDARD_USER
         );
     }
+
+    /**
+     * Atualiza os campos de um usuario convidado existente com base nos dados de um DTO.
+     *
+     * @param existingUser         {@link SystemUser} Usuário existente no sistema.
+     * @param simpleSystemUserDTO  {@link SimpleSystemUserDTO} Dados fornecidos para atualização.
+     */
+    public void updateSystemUserFromDTO(SystemUser existingUser, SimpleSystemUserDTO simpleSystemUserDTO) {
+        existingUser.setName(simpleSystemUserDTO.name());
+        existingUser.setPhoneNumber(simpleSystemUserDTO.phoneNumber());
+
+        if (simpleSystemUserDTO.cpfCnpj() != null && !simpleSystemUserDTO.cpfCnpj().isBlank()) {
+            existingUser.setCpfCnpj(simpleSystemUserDTO.cpfCnpj());
+        }
+
+        if (simpleSystemUserDTO.birthDate() != null) {
+            existingUser.setBirthDate(simpleSystemUserDTO.birthDate());
+        }
+
+        if (simpleSystemUserDTO.addresses() != null) {
+            AddressUser updatedAddress = mapToAddressEntity(
+                    mapSimpleAddressDTOToCompleteAddressDTO(simpleSystemUserDTO.addresses())
+            );
+            existingUser.setAddress(updatedAddress);
+        }
+    }
+
 
     /**
      * Mapeia um DTO de endereço para a entidade de endereço.
@@ -68,7 +95,7 @@ public class UserBuilder {
      * @return {@link AddressUser} com as informações do endereço.
      */
     private AddressUser mapToAddressEntity(AddressDTO dto) {
-        if (dto == null) {
+        if (dto == null|| isAddressEmpty(dto)) {
             return null;
         }
 
@@ -103,4 +130,21 @@ public class UserBuilder {
                 simpleAddressDTO.zipCode()
         );
     }
+
+    /**
+     * Verifica se um DTO de endereço está vazio (todos os campos nulos ou em branco).
+     *
+     * @param dto DTO de endereço.
+     * @return {@code true} se o DTO estiver vazio, caso contrário {@code false}.
+     */
+    private boolean isAddressEmpty(AddressDTO dto) {
+        return (dto.street() == null || dto.street().isBlank()) &&
+                (dto.number() == null || dto.number().isBlank()) &&
+                (dto.complement() == null || dto.complement().isBlank()) &&
+                (dto.neighborhood() == null || dto.neighborhood().isBlank()) &&
+                (dto.city() == null || dto.city().isBlank()) &&
+                (dto.state() == null || dto.state().isBlank()) &&
+                (dto.zipCode() == null || dto.zipCode().isBlank());
+    }
+
 }

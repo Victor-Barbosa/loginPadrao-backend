@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Serviço responsável por gerenciar o registro de usuários completos no sistema.
+ * Serviço responsável por gerir o registro de usuarios completos no sistema.
  */
 @Service
 public class CompleteSystemUserService {

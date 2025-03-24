@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Componente responsável por validar informações de usuários.
+ * Componente responsável por validar informações de usuarios.
  */
 @Component
 public class UserValidator {
@@ -23,8 +23,8 @@ public class UserValidator {
     /**
      * Valida a unicidade de CPF ou CNPJ.
      *
-     * @param cpfCnpj        CPF ou CNPJ do usuário.
-     * @param userIdToIgnore ID do usuário a ser ignorado na validação (para evitar conflitos em atualizações).
+     * @param cpfCnpj        CPF ou CNPJ do usuario.
+     * @param userIdToIgnore “ID” do usuario a ser ignorado na validação (para evitar conflitos em atualizações).
      * @throws CpfOrCnpjAlreadyInUseException Se o CPF ou CNPJ já estiver em uso.
      */
     public void validateCpfCnpjUniqueness(String cpfCnpj, String userIdToIgnore) {
@@ -35,11 +35,11 @@ public class UserValidator {
     }
 
     /**
-     * Valida a unicidade do email.
+     * Valida a unicidade do e-mail.
      *
-     * @param email          Email do usuário.
-     * @param userIdToIgnore ID do usuário a ser ignorado na validação (para evitar conflitos em atualizações).
-     * @throws EmailAlreadyInUseException Se o email já estiver em uso.
+     * @param email          E-mail do usuario.
+     * @param userIdToIgnore “ID” do usuario a ser ignorado na validação (para evitar conflitos em atualizações).
+     * @throws EmailAlreadyInUseException Se o e-mail já estiver em uso.
      */
     public void validateEmailUniqueness(String email, String userIdToIgnore) {
         Optional<SystemUser> existingUser = systemUserRepository.findByEmail(email);

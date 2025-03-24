@@ -3,7 +3,7 @@ package com.qualrole.backend.user.entity;
 import jakarta.persistence.*;
 
 /**
- * Entidade que representa o endereço de um usuário no sistema.
+ * Entidade que representa o endereço de um usuario no sistema.
  */
 @Entity
 @Table(name = "address_users")

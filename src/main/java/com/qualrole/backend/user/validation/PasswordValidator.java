@@ -23,7 +23,7 @@ public class PasswordValidator {
      *   <li>Pelo menos 1 caractere especial.</li>
      * </ul>
      *
-     * @param password Senha fornecida pelo usuário.
+     * @param password Senha fornecida pelo usuario.
      * @throws InvalidPasswordException Se a senha não atender aos critérios.
      */
     public void validatePassword(String password) {
