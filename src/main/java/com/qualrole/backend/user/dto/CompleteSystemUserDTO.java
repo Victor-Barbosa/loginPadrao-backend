@@ -2,6 +2,7 @@ package com.qualrole.backend.user.dto;
 
 import com.qualrole.backend.user.entity.Role;
 import com.qualrole.backend.validation.annotations.CpfOrCnpj;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ public record CompleteSystemUserDTO(
         String phoneNumber,
 
         @NotNull(message = "O endereço é obrigatório.")
+        @Valid
         AddressDTO addresses,
 
         @NotNull(message = "A data de nascimento é obrigatória.")
