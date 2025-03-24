@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controlador responsável pelo registro de usuários completos no sistema.
+ * Controlador responsável pelo registro de usuarios completos no sistema.
  */
 @RestController
 @RequestMapping("/api/users/complete")
@@ -23,6 +23,6 @@ public class CompleteSystemUserRegistrationController {
     @PostMapping
     public ResponseEntity<String> createUser(@Valid @RequestBody CompleteSystemUserDTO completeSystemUserDTO) {
         completeSystemUserService.registerCompleteSystemUser(completeSystemUserDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário criado com sucesso!");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado com sucesso!");
     }
 }

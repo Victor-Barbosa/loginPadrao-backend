@@ -11,17 +11,17 @@ import java.util.Optional;
 public interface SystemUserRepository extends JpaRepository<SystemUser, String> {
 
     /**
-     * Busca um usuário pelo e-mail.
+     * Busca um usuario pelo e-mail.
      *
-     * @param email Email do usuário.
+     * @param email e-mail do usuario.
      * @return {@link Optional} contendo o usuário, caso encontre.
      */
     Optional<SystemUser> findByEmail(String email);
 
     /**
-     * Busca um usuário pelo CPF ou CNPJ.
+     * Busca um usuario pelo CPF ou CNPJ.
      *
-     * @param cpfCnpj CPF ou CNPJ do usuário.
+     * @param cpfCnpj CPF ou CNPJ do usuario.
      * @return {@link Optional} contendo o usuário, caso encontre.
      */
     Optional<SystemUser> findByCpfCnpj(String cpfCnpj);

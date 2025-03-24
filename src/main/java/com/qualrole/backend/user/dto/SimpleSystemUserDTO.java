@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 /**
- * DTO para encapsular os dados de um usuário simples.
+ * DTO para encapsular os dados de um usuario simples.
  * Inclui informações pessoais e contato básico.
  */
 public record SimpleSystemUserDTO(

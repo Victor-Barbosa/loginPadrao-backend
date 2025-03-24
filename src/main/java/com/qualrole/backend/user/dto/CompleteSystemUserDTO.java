@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 /**
- * DTO para encapsular os dados de um usuário completo.
+ * DTO para encapsular os dados de um usuario completo.
  * Inclui informações pessoais, contato e endereço.
  */
 public record CompleteSystemUserDTO(

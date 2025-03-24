@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controlador responsável pelo registro de usuários simples no sistema.
+ * Controlador responsável pelo registro de usuarios simples no sistema.
  */
 @RestController
 @RequestMapping("/api/users/simple")
@@ -25,6 +25,6 @@ public class SimpleSystemUserRegistrationController {
     @PostMapping
     public ResponseEntity<String> registerSimpleUser(@Valid @RequestBody SimpleSystemUserDTO simpleSystemUserDTO) {
         simpleSystemUserService.registerSimpleSystemUser(simpleSystemUserDTO);
-        return ResponseEntity.ok("Usuário simples cadastrado com sucesso!");
+        return ResponseEntity.ok("Usuário cadastrado com sucesso!");
     }
 }
