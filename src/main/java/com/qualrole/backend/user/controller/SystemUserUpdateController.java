@@ -8,6 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador responsável por gerir a atualização de dados dos usuarios do sistema.
+ */
 @RestController
 @RequestMapping("/api/users")
 public class SystemUserUpdateController {

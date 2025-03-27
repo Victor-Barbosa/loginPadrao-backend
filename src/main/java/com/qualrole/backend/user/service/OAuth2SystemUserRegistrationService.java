@@ -15,7 +15,8 @@ public class OAuth2SystemUserRegistrationService {
     private final SystemUserRepository systemUserRepository;
     private final UserValidator userValidator;
 
-    public OAuth2SystemUserRegistrationService(SystemUserRepository systemUserRepository, UserValidator userValidator) {
+    public OAuth2SystemUserRegistrationService(SystemUserRepository systemUserRepository,
+                                               UserValidator userValidator) {
         this.systemUserRepository = systemUserRepository;
         this.userValidator = userValidator;
     }

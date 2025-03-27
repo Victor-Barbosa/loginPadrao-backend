@@ -1,4 +1,4 @@
-package com.qualrole.backend.user.excpetion;
+package com.qualrole.backend.user.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 

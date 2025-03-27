@@ -4,6 +4,9 @@ import com.qualrole.backend.user.builder.UserBuilder;
 import com.qualrole.backend.user.dto.SimpleSystemUserDTO;
 import com.qualrole.backend.user.entity.Role;
 import com.qualrole.backend.user.entity.SystemUser;
+import com.qualrole.backend.user.exception.GuestUserNotFoundException;
+import com.qualrole.backend.user.exception.InvalidUserRoleException;
+import com.qualrole.backend.user.exception.MissingRequiredFieldsException;
 import com.qualrole.backend.user.repository.SystemUserRepository;
 import com.qualrole.backend.user.validation.PasswordValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +42,7 @@ public class OAuth2SystemUserService {
     @Transactional
     public void promoteGuestToStandardUser(SimpleSystemUserDTO simpleSystemUserDTO) {
         SystemUser existingUser = systemUserRepository.findByEmail(simpleSystemUserDTO.email())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário GUEST não encontrado."));
+                .orElseThrow(() -> new GuestUserNotFoundException("Usuário GUEST não encontrado."));
 
         validateGuestRole(existingUser);
 
@@ -60,7 +63,7 @@ public class OAuth2SystemUserService {
      */
     private void validateGuestRole(SystemUser existingUser) {
         if (!existingUser.getRole().equals(Role.GUEST)) {
-            throw new IllegalArgumentException("Somente usuários com a role GUEST podem ser promovidos.");
+            throw new InvalidUserRoleException("Somente usuários com a role GUEST podem ser promovidos.");
         }
     }
 
@@ -71,13 +74,13 @@ public class OAuth2SystemUserService {
      */
     private void validateRequiredFields(SimpleSystemUserDTO simpleSystemUserDTO) {
         if (simpleSystemUserDTO.name() == null || simpleSystemUserDTO.name().isBlank()) {
-            throw new IllegalArgumentException("O nome é obrigatório para completar o cadastro.");
+            throw new MissingRequiredFieldsException("O nome é obrigatório para completar o cadastro.");
         }
         if (simpleSystemUserDTO.phoneNumber() == null || simpleSystemUserDTO.phoneNumber().isBlank()) {
-            throw new IllegalArgumentException("O telefone é obrigatório para completar o cadastro.");
+            throw new MissingRequiredFieldsException("O telefone é obrigatório para completar o cadastro.");
         }
         if (simpleSystemUserDTO.password() == null || simpleSystemUserDTO.password().isBlank()) {
-            throw new IllegalArgumentException("A senha é obrigatória para completar o cadastro.");
+            throw new MissingRequiredFieldsException("A senha é obrigatória para completar o cadastro.");
         }
         passwordValidator.validatePassword(simpleSystemUserDTO.password());
     }

@@ -1,6 +1,6 @@
 package com.qualrole.backend.user.validation;
 
-import com.qualrole.backend.exception.InvalidPasswordException;
+import com.qualrole.backend.user.exception.InvalidPasswordException;
 import org.springframework.stereotype.Component;
 
 /**

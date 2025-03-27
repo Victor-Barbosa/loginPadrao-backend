@@ -1,12 +1,7 @@
 package com.qualrole.backend.exception;
 
-import com.qualrole.backend.auth.exception.JWTSignatureException;
-import com.qualrole.backend.auth.exception.JWTValidationException;
-import com.qualrole.backend.auth.exception.OAuth2EmailNotFoundException;
-import com.qualrole.backend.auth.exception.UnauthorizedException;
-import com.qualrole.backend.user.excpetion.CpfOrCnpjAlreadyInUseException;
-import com.qualrole.backend.user.excpetion.EmailAlreadyInUseException;
-import com.qualrole.backend.user.excpetion.UserNotFoundException;
+import com.qualrole.backend.auth.exception.*;
+import com.qualrole.backend.user.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -26,49 +21,79 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CpfOrCnpjAlreadyInUseException.class)
     public ResponseEntity<ErrorResponse> handleCpfCnpjAlreadyInUse(CpfOrCnpjAlreadyInUseException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(EmailAlreadyInUseException.class)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyInUse(EmailAlreadyInUseException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(OAuth2EmailNotFoundException.class)
     public ResponseEntity<Object> handleOAuth2EmailNotFound(OAuth2EmailNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(JWTSignatureException.class)
     public ResponseEntity<ErrorResponse> handleJWTSignatureException(JWTSignatureException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(JWTValidationException.class)
     public ResponseEntity<ErrorResponse> handleJWTValidationException(JWTValidationException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedAccess(UnauthorizedException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEmailNotFoundException(EmailNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidJwtSecretKeyException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJwtSecretKeyException(InvalidJwtSecretKeyException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(GuestUserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGuestUserNotFoundException(GuestUserNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidUserRoleException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserRoleException(InvalidUserRoleException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingRequiredFieldsException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequiredFieldsException(MissingRequiredFieldsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -84,12 +109,12 @@ public class GlobalExceptionHandler {
         String finalMessage = String.join(", ", validationErrors);
 
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, finalMessage);
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado: " + ex.getMessage());
-        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 }
