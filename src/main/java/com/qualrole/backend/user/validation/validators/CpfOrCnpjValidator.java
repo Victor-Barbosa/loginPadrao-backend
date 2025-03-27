@@ -1,9 +1,9 @@
-package com.qualrole.backend.validation.validators;
+package com.qualrole.backend.user.validation.validators;
 
 import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import br.com.caelum.stella.validation.InvalidStateException;
-import com.qualrole.backend.validation.annotations.CpfOrCnpj;
+import com.qualrole.backend.user.validation.annotations.CpfOrCnpj;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

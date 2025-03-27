@@ -1,7 +1,7 @@
 package com.qualrole.backend.user.validation;
 
-import com.qualrole.backend.exception.CpfOrCnpjAlreadyInUseException;
-import com.qualrole.backend.exception.EmailAlreadyInUseException;
+import com.qualrole.backend.user.excpetion.CpfOrCnpjAlreadyInUseException;
+import com.qualrole.backend.user.excpetion.EmailAlreadyInUseException;
 import com.qualrole.backend.user.entity.SystemUser;
 import com.qualrole.backend.user.repository.SystemUserRepository;
 import org.springframework.stereotype.Component;

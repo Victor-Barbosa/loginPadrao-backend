@@ -3,6 +3,7 @@ package com.qualrole.backend.user.builder;
 import com.qualrole.backend.user.dto.CompleteSystemUserDTO;
 import com.qualrole.backend.user.dto.CompleteSystemUserDTO.AddressDTO;
 import com.qualrole.backend.user.dto.SimpleSystemUserDTO;
+import com.qualrole.backend.user.dto.SystemUserUpdateDTO;
 import com.qualrole.backend.user.entity.AddressUser;
 import com.qualrole.backend.user.entity.Role;
 import com.qualrole.backend.user.entity.SystemUser;
@@ -23,7 +24,6 @@ public class UserBuilder {
      */
     public SystemUser buildNewCompleteSystemUser(CompleteSystemUserDTO completeSystemUserDTO) {
         AddressUser address = mapToAddressEntity(completeSystemUserDTO.addresses());
-
         return new SystemUser(
                 null,
                 completeSystemUserDTO.name(),
@@ -62,12 +62,12 @@ public class UserBuilder {
     }
 
     /**
-     * Atualiza os campos de um usuario convidado existente com base nos dados de um DTO.
+     * Atualiza os campos de um usuario existente com base nos dados de um SimpleSystemUserDTO.
      *
-     * @param existingUser         {@link SystemUser} Usuário existente no sistema.
-     * @param simpleSystemUserDTO  {@link SimpleSystemUserDTO} Dados fornecidos para atualização.
+     * @param existingUser        {@link SystemUser} usuario existente no sistema.
+     * @param simpleSystemUserDTO {@link SimpleSystemUserDTO} Dados fornecidos para atualização.
      */
-    public void updateSystemUserFromDTO(SystemUser existingUser, SimpleSystemUserDTO simpleSystemUserDTO) {
+    public void updateOAuthSystemUser(SystemUser existingUser, SimpleSystemUserDTO simpleSystemUserDTO) {
         existingUser.setName(simpleSystemUserDTO.name());
         existingUser.setPhoneNumber(simpleSystemUserDTO.phoneNumber());
 
@@ -87,6 +87,30 @@ public class UserBuilder {
         }
     }
 
+    /**
+     * Atualiza os campos de um usuario existente com base nos dados de um SystemUserUpdateDTO.
+     *
+     * @param existingUser {@link SystemUser} usuario existente no sistema.
+     * @param updateDTO    {@link SystemUserUpdateDTO} Dados fornecidos para atualização.
+     */
+    public void updateSystemUser(SystemUser existingUser, SystemUserUpdateDTO updateDTO) {
+        if (updateDTO.name() != null) {
+            existingUser.setName(updateDTO.name());
+        }
+
+        if (updateDTO.phoneNumber() != null) {
+            existingUser.setPhoneNumber(updateDTO.phoneNumber());
+        }
+
+        if (updateDTO.birthDate() != null) {
+            existingUser.setBirthDate(updateDTO.birthDate());
+        }
+
+        if (updateDTO.address() != null) {
+            AddressUser updatedAddress = mapToAddressEntity(updateDTO.address());
+            existingUser.setAddress(updatedAddress);
+        }
+    }
 
     /**
      * Mapeia um DTO de endereço para a entidade de endereço.
@@ -95,21 +119,25 @@ public class UserBuilder {
      * @return {@link AddressUser} com as informações do endereço.
      */
     private AddressUser mapToAddressEntity(AddressDTO dto) {
-        if (dto == null|| isAddressEmpty(dto)) {
+        if (isAddressEmpty(dto)) {
             return null;
         }
+        return mapAddressToEntity(dto.street(), dto.number(), dto.complement(), dto.neighborhood(),
+                dto.city(), dto.state(), dto.zipCode());
+    }
 
-        return new AddressUser(
-                null,
-                dto.street(),
-                dto.number(),
-                dto.complement(),
-                dto.neighborhood(),
-                dto.city(),
-                dto.state(),
-                dto.zipCode(),
-                null
-        );
+    /**
+     * Mapeia um DTO de endereço geral (endereços do tipo SystemUserUpdateDTO).
+     *
+     * @param dto DTO representando o endereço.
+     * @return {@link AddressUser} com as informações do endereço.
+     */
+    private AddressUser mapToAddressEntity(SystemUserUpdateDTO.AddressDTO dto) {
+        if (isAddressEmpty(dto)) {
+            return null;
+        }
+        return mapAddressToEntity(dto.street(), dto.number(), dto.complement(), dto.neighborhood(),
+                dto.city(), dto.state(), dto.zipCode());
     }
 
     /**
@@ -137,14 +165,60 @@ public class UserBuilder {
      * @param dto DTO de endereço.
      * @return {@code true} se o DTO estiver vazio, caso contrário {@code false}.
      */
-    private boolean isAddressEmpty(AddressDTO dto) {
-        return (dto.street() == null || dto.street().isBlank()) &&
-                (dto.number() == null || dto.number().isBlank()) &&
-                (dto.complement() == null || dto.complement().isBlank()) &&
-                (dto.neighborhood() == null || dto.neighborhood().isBlank()) &&
-                (dto.city() == null || dto.city().isBlank()) &&
-                (dto.state() == null || dto.state().isBlank()) &&
-                (dto.zipCode() == null || dto.zipCode().isBlank());
+    private boolean isAddressEmpty(Object dto) {
+        return switch (dto) {
+            case CompleteSystemUserDTO.AddressDTO completeAddress -> isFieldsEmpty(
+                    completeAddress.street(),
+                    completeAddress.number(),
+                    completeAddress.complement(),
+                    completeAddress.neighborhood(),
+                    completeAddress.city(),
+                    completeAddress.state(),
+                    completeAddress.zipCode()
+            );
+            case SystemUserUpdateDTO.AddressDTO updateAddress -> isFieldsEmpty(
+                    updateAddress.street(),
+                    updateAddress.number(),
+                    updateAddress.complement(),
+                    updateAddress.neighborhood(),
+                    updateAddress.city(),
+                    updateAddress.state(),
+                    updateAddress.zipCode()
+            );
+            default -> true;
+        };
     }
 
+    /**
+     * Metodo auxiliar que verifica se todos os campos do endereço estão vazios ou nulos.
+     *
+     * @param fields Campos a serem verificados.
+     * @return {@code true} se todos os campos forem vazios ou nulos, caso contrário {@code false}.
+     */
+    private boolean isFieldsEmpty(String... fields) {
+        for (String field : fields) {
+            if (field != null && !field.isBlank()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Metodo auxiliar para criar uma entidade AddressUser.
+     */
+    private AddressUser mapAddressToEntity(String street, String number, String complement, String neighborhood,
+                                           String city, String state, String zipCode) {
+        return new AddressUser(
+                null,
+                street,
+                number,
+                complement,
+                neighborhood,
+                city,
+                state,
+                zipCode,
+                null
+        );
+    }
 }

@@ -77,6 +77,10 @@ public class SystemUser {
         return role;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

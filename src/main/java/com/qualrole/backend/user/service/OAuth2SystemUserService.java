@@ -45,7 +45,7 @@ public class OAuth2SystemUserService {
 
         validateRequiredFields(simpleSystemUserDTO);
 
-        userBuilder.updateSystemUserFromDTO(existingUser, simpleSystemUserDTO);
+        userBuilder.updateOAuthSystemUser(existingUser, simpleSystemUserDTO);
         existingUser.setPassword(passwordEncoder.encode(simpleSystemUserDTO.password()));
 
         existingUser.setRole(Role.STANDARD_USER);

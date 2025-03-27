@@ -1,5 +1,12 @@
 package com.qualrole.backend.exception;
 
+import com.qualrole.backend.auth.exception.JWTSignatureException;
+import com.qualrole.backend.auth.exception.JWTValidationException;
+import com.qualrole.backend.auth.exception.OAuth2EmailNotFoundException;
+import com.qualrole.backend.auth.exception.UnauthorizedException;
+import com.qualrole.backend.user.excpetion.CpfOrCnpjAlreadyInUseException;
+import com.qualrole.backend.user.excpetion.EmailAlreadyInUseException;
+import com.qualrole.backend.user.excpetion.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -43,6 +50,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(JWTSignatureException.class)
+    public ResponseEntity<ErrorResponse> handleJWTSignatureException(JWTSignatureException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(JWTValidationException.class)
+    public ResponseEntity<ErrorResponse> handleJWTValidationException(JWTValidationException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedAccess(UnauthorizedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
     }
 

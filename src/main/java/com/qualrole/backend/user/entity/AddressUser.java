@@ -45,7 +45,8 @@ public class AddressUser {
     public AddressUser() {
     }
 
-    public AddressUser(Long addressId, String street, String number, String complement, String neighborhood, String city, String state, String zipCode, SystemUser systemUser) {
+    public AddressUser(Long addressId, String street, String number, String complement,
+                       String neighborhood, String city, String state, String zipCode, SystemUser systemUser) {
         this.addressId = addressId;
         this.street = street;
         this.number = number;

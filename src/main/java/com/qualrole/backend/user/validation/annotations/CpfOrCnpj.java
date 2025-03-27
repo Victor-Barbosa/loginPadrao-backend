@@ -1,6 +1,6 @@
-package com.qualrole.backend.validation.annotations;
+package com.qualrole.backend.user.validation.annotations;
 
-import com.qualrole.backend.validation.validators.CpfOrCnpjValidator;
+import com.qualrole.backend.user.validation.validators.CpfOrCnpjValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
