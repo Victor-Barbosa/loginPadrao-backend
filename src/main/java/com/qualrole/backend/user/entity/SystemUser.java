@@ -81,6 +81,22 @@ public class SystemUser {
         return password;
     }
 
+    public String getCpfCnpj() {
+        return cpfCnpj;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public AddressUser getAddress() {
+        return address;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
