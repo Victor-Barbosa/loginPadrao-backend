@@ -26,7 +26,7 @@ public class OAuth2SuccessController {
 
         String email = authentication.getName();
 
-        String accessToken = jwtUtil.generateAccessToken(Map.of("role", "USER"), email);
+        String accessToken = jwtUtil.generateAccessToken(Map.of("role", "GUEST"), email);
         String refreshToken = jwtUtil.generateRefreshToken(email);
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
