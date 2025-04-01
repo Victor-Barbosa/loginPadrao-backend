@@ -27,16 +27,33 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.security:spring-security-oauth2-jose'
 
+	// JWT (Json Web Tokens)
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// JPA e Postgres
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.postgresql:postgresql'
 
+	// Redis e Jedis para cache
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Observabilidade
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+	// Bibliotecas para criptografia
 	implementation 'org.bouncycastle:bcprov-jdk18on:1.78'
 
+	// Biblioteca JSON: Jackson (substitui org.json:json)
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+	// Dependências para Testes
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.mockito:mockito-core:5.5.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+
 }
 
 tasks.named('test') {

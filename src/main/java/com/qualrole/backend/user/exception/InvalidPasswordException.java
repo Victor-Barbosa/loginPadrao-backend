@@ -1,4 +1,4 @@
-package com.qualrole.backend.exception;
+package com.qualrole.backend.user.exception;
 
 /**
  * Exceção lançada quando a senha fornecida não atende aos critérios definidos.

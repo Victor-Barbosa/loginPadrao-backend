@@ -1,4 +1,4 @@
-package com.qualrole.backend.exception;
+package com.qualrole.backend.user.exception;
 
 /**
  * Exceção lançada quando o CPF ou CNPJ fornecido já está em uso no sistema.

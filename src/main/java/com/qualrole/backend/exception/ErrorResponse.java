@@ -7,27 +7,9 @@ import java.time.LocalDateTime;
 /**
  * Representa a estrutura de uma resposta de erro ao cliente.
  */
-public class ErrorResponse {
-
-    private final int status;
-    private final String error;
-    private final LocalDateTime timestamp;
+public record ErrorResponse(int status, String error, LocalDateTime timestamp) {
 
     public ErrorResponse(HttpStatus status, String error) {
-        this.status = status.value();
-        this.error = error;
-        this.timestamp = LocalDateTime.now();
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+        this(status.value(), error, LocalDateTime.now());
     }
 }
