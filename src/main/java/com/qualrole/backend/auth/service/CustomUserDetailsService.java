@@ -1,4 +1,4 @@
-package com.qualrole.backend.auth.security;
+package com.qualrole.backend.auth.service;
 
 import com.qualrole.backend.auth.exception.EmailNotFoundException;
 import com.qualrole.backend.user.entity.SystemUser;
@@ -24,8 +24,19 @@ public class CustomUserDetailsService implements UserDetailsService {
         SystemUser user = systemUserRepository.findByEmail(email)
                 .orElseThrow(() -> new EmailNotFoundException("Usuário não encontrado com o e-mail: " + email));
 
+        return buildUserDetails(user);
+    }
+
+    public UserDetails loadUserById(String userId) throws UsernameNotFoundException {
+        SystemUser user = systemUserRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com UUID: " + userId));
+
+        return buildUserDetails(user);
+    }
+
+    private UserDetails buildUserDetails(SystemUser user) {
         return builder()
-                .username(user.getEmail())
+                .username(user.getSystemUserId())
                 .password(user.getPassword() != null ? user.getPassword() : "")
                 .authorities(user.getRole().name())
                 .accountExpired(false)

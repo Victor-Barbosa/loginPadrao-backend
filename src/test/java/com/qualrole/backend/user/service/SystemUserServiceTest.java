@@ -3,7 +3,7 @@ package com.qualrole.backend.user.service;
 import com.qualrole.backend.user.builder.UserBuilder;
 import com.qualrole.backend.user.dto.SystemUserUpdateDTO;
 import com.qualrole.backend.user.entity.SystemUser;
-import com.qualrole.backend.user.exception.UserNotFoundException;
+import com.qualrole.backend.exception.UserNotFoundException;
 import com.qualrole.backend.user.repository.SystemUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

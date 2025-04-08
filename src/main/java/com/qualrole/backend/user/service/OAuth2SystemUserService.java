@@ -1,12 +1,11 @@
 package com.qualrole.backend.user.service;
 
+import com.qualrole.backend.exception.UserNotFoundException;
 import com.qualrole.backend.user.builder.UserBuilder;
 import com.qualrole.backend.user.dto.SimpleSystemUserDTO;
 import com.qualrole.backend.user.entity.Role;
 import com.qualrole.backend.user.entity.SystemUser;
-import com.qualrole.backend.user.exception.GuestUserNotFoundException;
-import com.qualrole.backend.user.exception.InvalidUserRoleException;
-import com.qualrole.backend.user.exception.MissingRequiredFieldsException;
+import com.qualrole.backend.user.exception.*;
 import com.qualrole.backend.user.repository.SystemUserRepository;
 import com.qualrole.backend.user.validation.PasswordValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,9 +39,10 @@ public class OAuth2SystemUserService {
      * @param simpleSystemUserDTO Dados do DTO fornecido pelo cliente.
      */
     @Transactional
-    public void promoteGuestToStandardUser(SimpleSystemUserDTO simpleSystemUserDTO) {
-        SystemUser existingUser = systemUserRepository.findByEmail(simpleSystemUserDTO.email())
-                .orElseThrow(() -> new GuestUserNotFoundException("Usuário GUEST não encontrado."));
+    public void promoteGuestToStandardUser(String authenticatedUserId, SimpleSystemUserDTO simpleSystemUserDTO) {
+
+        SystemUser existingUser = systemUserRepository.findById(authenticatedUserId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o ID autenticado."));
 
         validateGuestRole(existingUser);
 
@@ -50,7 +50,6 @@ public class OAuth2SystemUserService {
 
         userBuilder.updateOAuthSystemUser(existingUser, simpleSystemUserDTO);
         existingUser.setPassword(passwordEncoder.encode(simpleSystemUserDTO.password()));
-
         existingUser.setRole(Role.STANDARD_USER);
 
         systemUserRepository.save(existingUser);
@@ -59,11 +58,11 @@ public class OAuth2SystemUserService {
     /**
      * Valida se o usuario é GUEST.
      *
-     * @param existingUser Usuario existente.
+     * @param existingUser usuario existente.
      */
     private void validateGuestRole(SystemUser existingUser) {
-        if (!existingUser.getRole().equals(Role.GUEST)) {
-            throw new InvalidUserRoleException("Somente usuários com a role GUEST podem ser promovidos.");
+        if (existingUser.getRole() != Role.GUEST) {
+            throw new InvalidUserRoleException("Somente Usuários com a role GUEST podem ser promovidos.");
         }
     }
 

@@ -1,8 +1,8 @@
 package com.qualrole.backend.auth.controller;
 
-import com.qualrole.backend.auth.security.JwtUtil;
+import com.qualrole.backend.auth.service.OAuth2Service;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,39 +13,35 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users/oauth2")
+@Slf4j
 public class OAuth2SuccessController {
 
-    private final JwtUtil jwtUtil;
+    private final OAuth2Service oAuth2Service;
 
-    public OAuth2SuccessController(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public OAuth2SuccessController(OAuth2Service oAuth2Service) {
+        this.oAuth2Service = oAuth2Service;
     }
 
     @GetMapping("/success")
     public ResponseEntity<Map<String, String>> success(Authentication authentication) {
-
         String email = authentication.getName();
+        Map<String, Object> result = oAuth2Service.handleOAuth2LoginSuccess(email);
 
-        String accessToken = jwtUtil.generateAccessToken(Map.of("role", "GUEST"), email);
-        String refreshToken = jwtUtil.generateRefreshToken(email);
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(2 * 24 * 60 * 60)
-                .build();
+        String accessToken = (String) result.get("accessToken");
+        String message = (String) result.get("message");
+        var refreshCookie = result.get("refreshCookie").toString();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie)
                 .body(Map.of(
-                        "message", "Login via OAuth2 realizado com sucesso!",
+                        "message", message,
                         "token", accessToken
                 ));
     }
 
     @GetMapping("/failure")
     public ResponseEntity<String> failure() {
-        return ResponseEntity.badRequest().body("O login via OAuth2 falhou. Tente novamente mais tarde.");
+        String errorMessage = oAuth2Service.handleOAuth2LoginFailure();
+        return ResponseEntity.badRequest().body(errorMessage);
     }
 }

@@ -1,10 +1,10 @@
 package com.qualrole.backend.user.controller;
 
-import com.qualrole.backend.auth.exception.UnauthorizedException;
 import com.qualrole.backend.user.dto.SimpleSystemUserDTO;
 import com.qualrole.backend.user.service.OAuth2SystemUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,13 +31,10 @@ public class OAuth2UserRegistrationController {
      * @return Confirmação de sucesso.
      */
     @PostMapping("/registration")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> completeRegistration(@Valid @RequestBody SimpleSystemUserDTO simpleSystemUserDTO) {
-
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new UnauthorizedException("Usuário não está autenticado.");
-        }
-
-        oAuth2SystemUserService.promoteGuestToStandardUser(simpleSystemUserDTO);
+        String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        oAuth2SystemUserService.promoteGuestToStandardUser(authenticatedUserId ,simpleSystemUserDTO);
         return ResponseEntity.ok("Cadastro atualizado!");
     }
 }

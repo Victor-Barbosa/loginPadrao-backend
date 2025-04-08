@@ -1,10 +1,11 @@
 package com.qualrole.backend.auth.controller;
 
-import com.qualrole.backend.auth.security.JwtUtil;
-import com.qualrole.backend.auth.security.RedisTokenBlacklistService;
+import com.qualrole.backend.auth.service.AuthenticationService;
+import com.qualrole.backend.exception.UserNotFoundException;
+import com.qualrole.backend.user.exception.InvalidPasswordException;
+import com.qualrole.backend.user.exception.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,81 +17,131 @@ import static org.mockito.Mockito.*;
 
 class AuthenticationControllerTest {
 
-    private JwtUtil jwtUtil;
-    private RedisTokenBlacklistService tokenBlacklistService;
+    private AuthenticationService authenticationService;
     private AuthenticationController authenticationController;
 
     @BeforeEach
     void setUp() {
-        jwtUtil = Mockito.mock(JwtUtil.class);
-        tokenBlacklistService = Mockito.mock(RedisTokenBlacklistService.class);
-        authenticationController = new AuthenticationController(jwtUtil, tokenBlacklistService);
+        authenticationService = mock(AuthenticationService.class);
+        authenticationController = new AuthenticationController(authenticationService);
     }
 
+
     @Test
-    void testLogin_Success() {
+    void shouldReturnAccessTokenOnLoginSuccess() {
         String email = "test@example.com";
-        String accessToken = "access-token";
-        String refreshToken = "refresh-token";
+        String password = "password";
+        String accessToken = "test-access-token";
+        String refreshCookieValue = "refreshToken=test-refresh-token";
 
-        when(jwtUtil.generateAccessToken(Map.of(), email)).thenReturn(accessToken);
-        when(jwtUtil.generateRefreshToken(email)).thenReturn(refreshToken);
+        AuthenticationController.LoginRequest loginRequest =
+                new AuthenticationController.LoginRequest(email, password);
 
-        AuthenticationController.LoginRequest loginRequest = new AuthenticationController
-                .LoginRequest(email, "password");
+        Map<String, Object> serviceResponse = Map.of(
+                "accessToken", accessToken,
+                "refreshCookie", refreshCookieValue
+        );
+        when(authenticationService.login(email, password)).thenReturn(serviceResponse);
 
         ResponseEntity<Map<String, String>> response = authenticationController.login(loginRequest);
 
-        assertNotNull(response.getBody(), "Body da resposta não deve ser nulo");
+        assertNotNull(response.getBody(), "O corpo da resposta não deve ser nulo.");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(accessToken, response.getBody().get("accessToken"));
         assertTrue(response.getHeaders().containsKey(HttpHeaders.SET_COOKIE),
-                "Cabeçalhos devem conter SET_COOKIE");
+                "O cabeçalho deve conter 'Set-Cookie'.");
+        assertEquals(refreshCookieValue, response.getHeaders().getFirst(HttpHeaders.SET_COOKIE));
 
-        verify(jwtUtil).generateAccessToken(Map.of(), email);
-        verify(jwtUtil).generateRefreshToken(email);
+        verify(authenticationService).login(email, password);
     }
 
     @Test
-    void testRefreshToken_Success() {
+    void shouldReturnNotFoundWhenUserDoesNotExist() {
+        String email = "nonexistent@example.com";
+        String password = "password";
+
+        when(authenticationService.login(email, password)).thenThrow(
+                new UserNotFoundException("Usuário com o e-mail " + email + " não encontrado.")
+        );
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
+                authenticationService.login(email, password)
+        );
+
+        assertEquals("Usuário com o e-mail nonexistent@example.com não encontrado.", exception.getMessage());
+        verify(authenticationService).login(email, password);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenPasswordIsInvalid() {
+        String email = "test@example.com";
+        String invalidPassword = "wrong-password";
+
+        when(authenticationService.login(email, invalidPassword)).thenThrow(
+                new InvalidPasswordException("Senha inválida para o usuário " + email + ".")
+        );
+
+        InvalidPasswordException exception = assertThrows(InvalidPasswordException.class, () ->
+                authenticationService.login(email, invalidPassword)
+        );
+
+        assertEquals("Senha inválida para o usuário test@example.com.", exception.getMessage());
+        verify(authenticationService).login(email, invalidPassword);
+    }
+
+
+    @Test
+    void shouldReturnNewAccessTokenAndRefreshTokenOnRefreshSuccess() {
         String refreshToken = "valid-refresh-token";
-        String username = "tester";
         String newAccessToken = "new-access-token";
-        String newRefreshToken = "new-refresh-token";
+        String newRefreshCookieValue = "refreshToken=new-refresh-token";
 
-        when(tokenBlacklistService.isTokenBlacklisted(refreshToken)).thenReturn(false);
-        when(jwtUtil.extractUsername(refreshToken)).thenReturn(username);
-        when(jwtUtil.generateAccessToken(Map.of(), username)).thenReturn(newAccessToken);
-        when(jwtUtil.generateRefreshToken(username)).thenReturn(newRefreshToken);
+        Map<String, Object> serviceResponse = Map.of(
+                "accessToken", newAccessToken,
+                "refreshCookie", newRefreshCookieValue
+        );
+        when(authenticationService.refreshAccessToken(refreshToken)).thenReturn(serviceResponse);
 
-        ResponseEntity<Map<String, String>> response = authenticationController.refreshToken(refreshToken);
+        ResponseEntity<?> response = authenticationController.refreshToken(refreshToken);
 
-        assertNotNull(response.getBody(), "Body da resposta não deve ser nulo");
+        assertNotNull(response.getBody(), "O corpo da resposta não deve ser nulo.");
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(newAccessToken, response.getBody().get("accessToken"));
+        assertEquals(newAccessToken, ((Map<?, ?>) response.getBody()).get("accessToken"));
         assertTrue(response.getHeaders().containsKey(HttpHeaders.SET_COOKIE),
-                "Cabeçalhos devem conter SET_COOKIE");
+                "O cabeçalho deve conter 'Set-Cookie'.");
+        assertEquals(newRefreshCookieValue, response.getHeaders().getFirst(HttpHeaders.SET_COOKIE));
 
-        verify(tokenBlacklistService).isTokenBlacklisted(refreshToken);
-        verify(tokenBlacklistService).addTokenToBlacklist(refreshToken, 2 * 24 * 60 * 60 * 1000L);
-        verify(jwtUtil).generateAccessToken(Map.of(), username);
-        verify(jwtUtil).generateRefreshToken(username);
+        verify(authenticationService).refreshAccessToken(refreshToken);
     }
 
     @Test
-    void testRefreshToken_BlacklistedToken() {
-        String refreshToken = "blacklisted-token";
+    void shouldReturnUnauthorizedWhenRefreshTokenIsNullOrEmpty() {
 
-        when(tokenBlacklistService.isTokenBlacklisted(refreshToken)).thenReturn(true);
+        when(authenticationService.refreshAccessToken(null)).thenThrow(
+                new UnauthorizedException("Refresh token não encontrado no cookie.")
+        );
 
-        ResponseEntity<Map<String, String>> response = authenticationController.refreshToken(refreshToken);
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () ->
+                authenticationService.refreshAccessToken(null)
+        );
 
-        assertNotNull(response.getBody(), "Body da resposta não deve ser nulo");
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Token inválido ou revogado", response.getBody().get("error"));
+        assertEquals("Refresh token não encontrado no cookie.", exception.getMessage());
+        verify(authenticationService).refreshAccessToken(null);
+    }
 
-        verify(tokenBlacklistService).isTokenBlacklisted(refreshToken);
-        verify(jwtUtil, never()).extractUsername(anyString());
-        verify(jwtUtil, never()).generateAccessToken(Mockito.any(), anyString());
+    @Test
+    void shouldReturnNotFoundWhenUserIsNotFoundForRefreshToken() {
+        String refreshToken = "invalid-refresh-token";
+
+        when(authenticationService.refreshAccessToken(refreshToken)).thenThrow(
+                new UserNotFoundException("Usuário não encontrado ao validar o refresh token.")
+        );
+
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () ->
+                authenticationService.refreshAccessToken(refreshToken)
+        );
+
+        assertEquals("Usuário não encontrado ao validar o refresh token.", exception.getMessage());
+        verify(authenticationService).refreshAccessToken(refreshToken);
     }
 }

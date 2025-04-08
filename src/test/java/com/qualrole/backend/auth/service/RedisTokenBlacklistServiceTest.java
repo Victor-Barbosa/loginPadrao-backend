@@ -1,4 +1,4 @@
-package com.qualrole.backend.auth.security;
+package com.qualrole.backend.auth.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

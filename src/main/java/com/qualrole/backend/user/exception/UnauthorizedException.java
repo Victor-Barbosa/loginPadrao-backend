@@ -1,4 +1,4 @@
-package com.qualrole.backend.auth.exception;
+package com.qualrole.backend.user.exception;
 
 /**
  * Exceção definida para indicar erros de acesso não autorizado.
