@@ -1,6 +1,5 @@
 package com.qualrole.backend.user.controller;
 
-import com.qualrole.backend.auth.exception.UnauthorizedException;
 import com.qualrole.backend.user.dto.SimpleSystemUserDTO;
 import com.qualrole.backend.user.service.OAuth2SystemUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,12 +8,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class OAuth2UserRegistrationControllerTest {
@@ -34,11 +33,13 @@ class OAuth2UserRegistrationControllerTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
         controller = new OAuth2UserRegistrationController(oAuth2SystemUserService);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
     void shouldCompleteRegistrationSuccessfully() {
-        // Arrange
         SimpleSystemUserDTO dto = new SimpleSystemUserDTO(
                 "Test User",
                 "test@example.com",
@@ -50,25 +51,21 @@ class OAuth2UserRegistrationControllerTest {
                 null
         );
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
+        String authenticatedUserId = "authenticated-user-id";
+        when(authentication.getName()).thenReturn(authenticatedUserId);
 
-        doNothing().when(oAuth2SystemUserService).promoteGuestToStandardUser(any(SimpleSystemUserDTO.class));
+        doNothing().when(oAuth2SystemUserService).promoteGuestToStandardUser(eq(authenticatedUserId), eq(dto));
 
-        // Act
         ResponseEntity<String> response = controller.completeRegistration(dto);
 
-        // Assert
         assertEquals("Cadastro atualizado!", response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(oAuth2SystemUserService, times(1)).promoteGuestToStandardUser(dto);
+        verify(oAuth2SystemUserService, times(1))
+                .promoteGuestToStandardUser(authenticatedUserId, dto);
     }
 
     @Test
-    void shouldThrowUnauthorizedExceptionWhenUserIsNotAuthenticated() {
-        // Arrange
-        SecurityContextHolder.clearContext(); // Garante que não há contexto de autenticação
-
+    void shouldThrowAccessDeniedWhenUserIsNotGuest() {
         SimpleSystemUserDTO dto = new SimpleSystemUserDTO(
                 "Test User",
                 "test@example.com",
@@ -80,12 +77,18 @@ class OAuth2UserRegistrationControllerTest {
                 null
         );
 
-        // Act & Assert
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () ->
+        String authenticatedUserId = "authenticated-user-id";
+        when(authentication.getName()).thenReturn(authenticatedUserId);
+
+        doThrow(new AccessDeniedException("Acesso negado"))
+                .when(oAuth2SystemUserService).promoteGuestToStandardUser(eq(authenticatedUserId), eq(dto));
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class, () ->
                 controller.completeRegistration(dto)
         );
 
-        assertEquals("Usuário não está autenticado.", exception.getMessage());
-        verify(oAuth2SystemUserService, never()).promoteGuestToStandardUser(any(SimpleSystemUserDTO.class));
+        assertEquals("Acesso negado", exception.getMessage());
+        verify(oAuth2SystemUserService, times(1))
+                .promoteGuestToStandardUser(authenticatedUserId, dto);
     }
 }

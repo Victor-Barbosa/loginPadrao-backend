@@ -1,6 +1,6 @@
 package com.qualrole.backend.user.service;
 
-import com.qualrole.backend.user.exception.UserNotFoundException;
+import com.qualrole.backend.exception.UserNotFoundException;
 import com.qualrole.backend.user.builder.UserBuilder;
 import com.qualrole.backend.user.dto.SystemUserUpdateDTO;
 import com.qualrole.backend.user.entity.SystemUser;

@@ -1,6 +1,7 @@
 package com.qualrole.backend.user.dto;
 
 import com.qualrole.backend.user.entity.Role;
+import com.qualrole.backend.user.validation.annotations.CpfOrCnpj;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -26,6 +27,7 @@ public record SimpleSystemUserDTO(
         @NotBlank(message = "A senha é obrigatória.")
         String password,
 
+        @CpfOrCnpj
         String cpfCnpj,
         AddressDTO addresses,
         LocalDate birthDate,

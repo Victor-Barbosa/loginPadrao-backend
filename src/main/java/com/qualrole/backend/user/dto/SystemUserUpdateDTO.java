@@ -1,5 +1,7 @@
 package com.qualrole.backend.user.dto;
 
+import jakarta.validation.constraints.Pattern;
+
 import java.time.LocalDate;
 
 
@@ -9,6 +11,8 @@ import java.time.LocalDate;
  */
 public record SystemUserUpdateDTO(
         String name,
+        @Pattern(regexp = "\\d{10,15}", message = "Telefone inválido. Deve ter entre 10 e 25 caracteres " +
+                "e conter apenas números, espaços e símbolos permitidos.")
         String phoneNumber,
         LocalDate birthDate,
         AddressDTO address

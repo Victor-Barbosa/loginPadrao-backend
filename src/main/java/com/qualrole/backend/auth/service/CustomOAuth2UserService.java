@@ -1,4 +1,4 @@
-package com.qualrole.backend.auth.security;
+package com.qualrole.backend.auth.service;
 
 import com.qualrole.backend.auth.exception.OAuth2EmailNotFoundException;
 import com.qualrole.backend.user.entity.SystemUser;

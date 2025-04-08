@@ -45,6 +45,9 @@ public class SecurityConfig {
                                 "/api/users/oauth2/success",
                                 "/api/users/oauth2/failure"
                         ).permitAll()
+                        .requestMatchers("/api/complete/registration").hasRole("GUEST")
+                        .requestMatchers("/api/users/update").hasAnyRole(
+                                "ADMIN", "EVENT_CREATOR", "STANDARD_USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

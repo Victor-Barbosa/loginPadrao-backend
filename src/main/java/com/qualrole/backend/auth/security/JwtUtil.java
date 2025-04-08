@@ -2,6 +2,7 @@ package com.qualrole.backend.auth.security;
 
 import com.qualrole.backend.auth.exception.JWTSignatureException;
 import com.qualrole.backend.auth.exception.JWTValidationException;
+import com.qualrole.backend.user.entity.SystemUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -28,19 +28,20 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(Map<String, Object> claims, String subject) {
+    public String generateAccessToken(SystemUser user) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date())
+                .setSubject(user.getSystemUserId())
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String generateRefreshToken(String subject) {
+    public String generateRefreshToken(String systemUserId) {
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(systemUserId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -65,7 +66,7 @@ public class JwtUtil {
         }
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractClaims(token).getSubject();
     }
 
@@ -73,7 +74,7 @@ public class JwtUtil {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
-    public boolean isTokenValid(String token, String username) {
-        return (extractUsername(token).equals(username) && !isTokenExpired(token));
+    public boolean isTokenValid(String token, String userId) {
+        return (extractUserId(token).equals(userId) && !isTokenExpired(token));
     }
 }
